@@ -1,0 +1,25 @@
+# tomcat配置
+server:
+  port: 80
+  servlet:
+    context-path: "/community"
+
+
+# 数据源配置
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/community?serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: password
+  thymeleaf:  # thymeleaf配置
+    cache: false
+
+# mybatis配置
+mybatis:
+  mapper-locations: classpath:mapper/*Mapper.xml
+  type-aliases-package: com/nowcoder/community/entity  # 为这个路径包下的类注册别名 比如 com.nowcoder.community.entity.User类的别名为user（别名不区分大小写）
+  configuration:
+    use-generated-keys: true  # 在insert一条新数据到数据库之后，将生成的id值返回给Java对象，赋值为对象的id属性
+    map-underscore-to-camel-case: true  # 数据库user_address和属性名UserAddress直接能够进行匹配，无需在Mapper.xml文件中使用select user_address as UserAddress的方式来读取数据
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
