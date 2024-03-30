@@ -23,3 +23,9 @@ mybatis:
     use-generated-keys: true  # 在insert一条新数据到数据库之后，将生成的id值返回给Java对象，赋值为对象的id属性
     map-underscore-to-camel-case: true  # 数据库user_address和属性名UserAddress直接能够进行匹配，无需在Mapper.xml文件中使用select user_address as UserAddress的方式来读取数据
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 配置日志级别、日志输出文件
+#logging:
+#  level:
+#    root: info
+#  file: community.log
