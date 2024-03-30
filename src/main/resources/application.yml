@@ -14,6 +14,18 @@ spring:
     password: password
   thymeleaf:  # thymeleaf配置
     cache: false
+  # 发送邮件相关配置
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 1970869031@qq.com
+    password: olzccajkrszjdihb
+    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
 
 # mybatis配置
 mybatis:
@@ -29,3 +41,4 @@ mybatis:
 #  level:
 #    root: info
 #  file: community.log
+
