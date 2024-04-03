@@ -14,4 +14,24 @@
         WHERE id = #{id}
     </select>
 
+    <select id="selectByUsername" resultType="user">
+        SELECT <include refid="userColumnName"/>
+        FROM user
+        WHERE username = #{username}
+    </select>
+
+    <select id="selectByEmail" resultType="user">
+        SELECT <include refid="userColumnName"/>
+        FROM user
+        WHERE email = #{email}
+    </select>
+
+    <insert id="insert" parameterType="user" useGeneratedKeys="true" keyProperty="id">
+        insert into user(<include refid="userColumnName"></include>) values (null, #{username}, #{password}, #{salt}, #{email}, #{type}, #{status}, #{activationCode}, #{headerUrl}, #{createTime})
+    </insert>
+
+    <update id="updateStatus">
+        update user set status = #{status} where id = #{id}
+    </update>
+
 </mapper>

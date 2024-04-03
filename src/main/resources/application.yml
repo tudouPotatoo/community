@@ -42,3 +42,7 @@ mybatis:
 #    root: info
 #  file: community.log
 
+# 服务的域名
+community:
+  path:
+    domain: http://localhost:80
