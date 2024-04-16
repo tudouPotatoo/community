@@ -99,7 +99,7 @@ public class UserService implements CommunityConstant {
         // activationCode
         user.setActivationCode(CommunityUtil.generateUUID());
         // headerUrl
-        user.setHeaderUrl(String.format("images.nowcoder.com/head/%dt.png", new Random().nextInt(1000)));
+        user.setHeaderUrl(String.format("http://images.nowcoder.com/head/%dt.png", new Random().nextInt(1000)));
         // createTime
         user.setCreateTime(new Date());
 
