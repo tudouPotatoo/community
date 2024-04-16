@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+/**
+ * 封装邮件发送类
+ */
 @Slf4j
 @Component
 public class EmailSender {

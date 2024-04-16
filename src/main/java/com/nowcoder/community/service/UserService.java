@@ -1,6 +1,8 @@
 package com.nowcoder.community.service;
 
+import com.nowcoder.community.entity.LoginTicket;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.mapper.LoginTicketMapper;
 import com.nowcoder.community.mapper.UserMapper;
 import com.nowcoder.community.utils.CommunityConstant;
 import com.nowcoder.community.utils.CommunityUtil;
@@ -22,6 +24,9 @@ import java.util.Random;
 public class UserService implements CommunityConstant {
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
 
     @Autowired
     private TemplateEngine templateEngine;
@@ -109,7 +114,7 @@ public class UserService implements CommunityConstant {
         // 激活链接：http://localhost:80/community/register/1(用户id)/激活码
         String activationLink = domain + contextPath + "/register/" + user.getId() + "/" + user.getActivationCode();
         context.setVariable("url", activationLink);
-        System.out.println("activationLink:" + activationLink);
+        // System.out.println("activationLink:" + activationLink);
 
         String process = templateEngine.process("/mail/activation", context);
         emailSender.sendMail(user.getEmail(), "激活邮箱", process);
@@ -118,18 +123,30 @@ public class UserService implements CommunityConstant {
 
     /**
      * 激活账户
+     * 1. 检查userId是否合法
+     * 2. 根据userId获取用户user信息
+     * 3. 检查user激活状态
+     *    3.1 已经激活过 --> 返回重复激活信息
+     *    3.2 没有激活过 检查激活码是否正确
+     *            不正确 --> 返回激活失败信息
+     *            正确   --> 激活用户 返回激活成功信息
      * @param userId 用户id
      * @param activationCode 激活码
      * @return 返回激活状态
      */
     public int activate(Integer userId, String activationCode) {
+        // 1. 检查userId是否合法
         if (userId == null) {
             return CommunityConstant.ACTIVATION_FAILURE;
         }
+        // 2. 根据userId获取用户user信息
         User user = userMapper.selectById(userId);
-        // 当前用户已经激活过了 重复激活
+
+        // 3. 检查user激活状态
+        // 3.1 已经激活过 --> 返回重复激活信息
         if (user.getStatus() == 1) {
             return CommunityConstant.ACTIVATION_REPEAT;
+            // 3.2 没有激活过 检查激活码是否正确
         } else {
             // 如果提供的激活码不正确 则激活失败
             if (!user.getActivationCode().equals(activationCode)) {
@@ -143,5 +160,65 @@ public class UserService implements CommunityConstant {
         }
     }
 
+    /*
+     * 用户登陆
+     * 1. 验证username passwords是否为空
+     * 2. 验证username是否存在
+     * 3. 验证password是否正确
+     *    上面1-3通过之后说明用户信息无误，可以进行登陆
+     * 4. 生成登陆凭证 插入数据库 返回LoginTicket的ticket信息
+     *    （返回到Controller层将ticket信息添加到Cookie，让用户能够获得ticket并且每次访问都携带ticket，实现维持登陆状态）
+     * @param username
+     * @param password
+     * @param expiredSeconds
+     * @return
+     */
+    public Map<String, Object> login(String username, String password, int expiredSeconds) {
+        Map<String, Object> loginInfo = new HashMap<>();
+        // 1. 验证username passwords是否为空
+        if (StringUtils.isBlank(username)) {
+            loginInfo.put("usernameMsg", "用户名不能为空！");
+            return loginInfo;
+        }
+        if (StringUtils.isBlank(password)) {
+            loginInfo.put("passwordMsg", "密码不能为空！");
+            return loginInfo;
+        }
+        // 2. 验证username是否存在
+        User user = userMapper.selectByUsername(username);
+        if (user == null) {
+            loginInfo.put("usernameMsg", "该用户不存在！");
+            return loginInfo;
+        }
+        // 3. 验证password是否正确
+        if (!CommunityUtil.md5(password + user.getSalt()).equals(user.getPassword())) {
+            loginInfo.put("passwordMsg", "密码错误！");
+            return loginInfo;
+        }
+        // 上面1-3通过之后说明用户信息无误，可以进行登陆
+        // 生成登陆凭证
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(user.getId());
+        loginTicket.setStatus(1);
+        loginTicket.setTicket(CommunityUtil.generateUUID());
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000));
+        // 插入数据库
+        loginTicketMapper.insert(loginTicket);
+        // 返回LoginTicket的ticket信息
+        loginInfo.put("loginTicket", loginTicket.getTicket());
+        return loginInfo;
+    }
 
+    /**
+     * 退出登陆
+     * 将ticket所对应的LoginTicket登陆凭证设为无效
+     * @param ticket
+     */
+    public void logout(String ticket) {
+        LoginTicket loginTicket = loginTicketMapper.selectByTicket(ticket);
+        if (loginTicket != null) {
+            // 将登陆凭证设为无效（0）
+            loginTicketMapper.updateStatus(ticket, 0);
+        }
+    }
 }
