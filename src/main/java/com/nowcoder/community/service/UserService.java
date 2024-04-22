@@ -221,4 +221,14 @@ public class UserService implements CommunityConstant {
             loginTicketMapper.updateStatus(ticket, 0);
         }
     }
+
+    /**
+     * 修改用户的头像
+     * @param userId
+     * @param headerUrl
+     * @return
+     */
+    public int updateHeader(Integer userId, String headerUrl) {
+        return userMapper.updateHeaderUrl(userId, headerUrl);
+    }
 }

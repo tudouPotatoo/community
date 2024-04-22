@@ -46,3 +46,5 @@ mybatis:
 community:
   path:
     domain: http://localhost:80
+  upload:
+    path: C:\Users\tudou\IdeaProjects\community_user_headers

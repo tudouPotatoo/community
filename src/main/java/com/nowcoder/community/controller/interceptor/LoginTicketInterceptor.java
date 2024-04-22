@@ -45,7 +45,7 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
 
         // 从HostHolder中获取user对象，放入ModelAndView对象中
         User user = hostHolder.getUser();
-        if (user != null) {
+        if (user != null && modelAndView != null) {
             modelAndView.addObject("loginUser", user);
         }
     }

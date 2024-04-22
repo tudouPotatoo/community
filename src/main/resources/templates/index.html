@@ -35,11 +35,9 @@
 							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser==null}">
 								<a class="nav-link" th:href="@{/login}">登录</a>
 							</li>
-<!--							<li class="nav-item ml-3 btn-group-vertical dropdown" th:if="${loginUser!=null}">-->
 							<li class="nav-item ml-3 btn-group-vertical dropdown" th:if="${loginUser!=null}">
 								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									<img th:src="${loginUser.headerUrl}" class="rounded-circle" style="width:30px;"/>
-<!--									<img src="images.nowcoder.com/head/100t.png" class="rounded-circle" style="width:30px;"/>-->
 								</a>
 								<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 									<a class="dropdown-item text-center" href="site/profile.html">个人主页</a>
@@ -47,7 +45,6 @@
 									<a class="dropdown-item text-center" th:href="@{/logout}">退出登录</a>
 									<div class="dropdown-divider"></div>
 									<span class="dropdown-item text-center text-secondary" th:utext="${loginUser.username}">nowcoder</span>
-<!--									<span class="dropdown-item text-center text-secondary">nowcoder</span>-->
 								</div>
 							</li>
 						</ul>
@@ -229,7 +226,9 @@
 
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+	<!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>-->
+	<!--国内源-->
+	<script src="https://cdn.staticfile.net/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
 	<script th:src="@{/js/global.js}"></script>
 	<script th:src="@{js/index.js}"></script>
 </body>
