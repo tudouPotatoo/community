@@ -7,11 +7,11 @@ import com.nowcoder.community.mapper.UserMapper;
 import com.nowcoder.community.utils.CommunityConstant;
 import com.nowcoder.community.utils.CommunityUtil;
 import com.nowcoder.community.utils.EmailSender;
+import com.nowcoder.community.utils.HostHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -22,6 +22,10 @@ import java.util.Random;
 
 @Service
 public class UserService implements CommunityConstant {
+
+    @Autowired
+    private HostHolder hostHolder;
+
     @Autowired
     private UserMapper userMapper;
 
@@ -230,5 +234,38 @@ public class UserService implements CommunityConstant {
      */
     public int updateHeader(Integer userId, String headerUrl) {
         return userMapper.updateHeaderUrl(userId, headerUrl);
+    }
+
+    /**
+     * 更新用户密码
+     * 1. 从ThreadLocal中获取当前登录用户信息
+     * 2. 校验原始密码是否正确
+     *    错误 --> 返回密码错误信息
+     *    正确 --> 继续往下
+     * 3. 修改密码为新密码
+     * @param oldPassword
+     * @param newPassword
+     * @return
+     */
+    public Map<String,String> updatePassword(String oldPassword, String newPassword) {
+        Map<String, String> info = new HashMap<>();
+        // 1. 从ThreadLocal中获取当前登录用户信息
+        User user = hostHolder.getUser();
+        Integer userId = user.getId();
+        String salt = user.getSalt();
+        String password = user.getPassword();
+        // 2. 校验原始密码是否正确
+        oldPassword = CommunityUtil.md5(oldPassword + salt);
+        // 错误 --> 返回密码错误信息
+        if (!oldPassword.equals(password)) {
+            info.put("oldPasswordMsg", "密码错误！");
+            return info;
+        }
+        // 正确 --> 继续往下
+
+        // 3. 修改密码为新密码
+        newPassword = CommunityUtil.md5(newPassword + salt);
+        userMapper.updatePassword(userId, newPassword);
+       return info;
     }
 }

@@ -1,5 +1,6 @@
 package com.nowcoder.community.controller;
 
+import com.nowcoder.community.annotation.LoginRequired;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.utils.CommunityUtil;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -46,6 +48,7 @@ public class UserController {
      * 获取账号设置页面路径
      * @return 账号设置页面路径
      */
+    @LoginRequired
     @GetMapping("/setting")
     public String getSettingPage() {
         return "/site/setting";
@@ -67,6 +70,7 @@ public class UserController {
      * @param mv
      * @return
      */
+    @LoginRequired
     @PostMapping("/upload")
     public ModelAndView uploadHeader(MultipartFile headerImage, ModelAndView mv) {
         // 1. 校验上传的图片headerImage是否为空
@@ -161,5 +165,41 @@ public class UserController {
             log.error("读取头像失败：" + e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 修改密码
+     * @param oldPassword
+     * @param newPassword
+     * @param confirmNewPassword
+     * @param mv
+     * @return
+     */
+    @LoginRequired
+    @PostMapping("/updatePassword")
+    public ModelAndView updatePassword(String oldPassword, String newPassword, String confirmNewPassword, ModelAndView mv) {
+        mv.setViewName("/site/setting");
+        if (StringUtils.isBlank(oldPassword)) {
+            mv.addObject("oldPasswordMsg", "密码不能为空！");
+            return mv;
+        }
+        if (StringUtils.isBlank(newPassword)) {
+            mv.addObject("newPasswordMsg", "新密码不能为空！");
+            return mv;
+        }
+        if (StringUtils.isBlank(confirmNewPassword)) {
+            mv.addObject("confirmNewPasswordMsg", "再次输入新密码！");
+            return mv;
+        }
+        if (!newPassword.equals(confirmNewPassword)) {
+            mv.addObject("confirmNewPasswordMsg", "两次输入的密码不一致!");
+            return mv;
+        }
+        Map<String, String> map = userService.updatePassword(oldPassword, newPassword);
+        if (map.containsKey("oldPasswordMsg")) {
+            mv.addObject("oldPasswordMsg", map.get("oldPasswordMsg"));
+            return mv;
+        }
+        return mv;
     }
 }

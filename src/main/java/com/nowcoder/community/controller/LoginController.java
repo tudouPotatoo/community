@@ -39,7 +39,7 @@ public class LoginController implements CommunityConstant {
      * 获取注册页面
      * @return 返回注册页面路径
      */
-    @GetMapping(path = "register")
+    @GetMapping(path = "/register")
     public String getRegisterPage() {
         return "/site/register";
     }
@@ -48,7 +48,7 @@ public class LoginController implements CommunityConstant {
      * 获取登录页面
      * @return 返回登录页面路径
      */
-    @GetMapping(path = "login")
+    @GetMapping(path = "/login")
     public String getLoginPage() {
         return "/site/login";
     }
