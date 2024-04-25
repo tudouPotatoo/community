@@ -135,7 +135,7 @@ public class SensitiveWordsFilter {
      *    3.2 判断当前字符是否特殊符号
      *          不是 --> 继续往下
      *            是 --> 判断当前特殊字符是否在敏感词内部(吸※毒)（即是否满足from==to）
-     *                      不是 --> 则可以加入res，from右移一位，to=from，triePointer回到trieRoot
+     *                      不是 --> 则可以加入res，from右移一位，to=from，triePointer回到trieRoot（不回也可以 因为此时triePointer本来就在trieRoot）
      *                        是 --> 则跳过当前字符，to右移一位
      *    3.3 判断当前的父节点是否包含字符为c的子节点
      *          不是 --> 说明[from, to]这个子串不是敏感词，则from位置的字符加入res
@@ -173,7 +173,7 @@ public class SensitiveWordsFilter {
                     from++;
                     to = from;
                     // triePointer回到trieRoot
-                    triePointer = trieRoot;
+                    // triePointer = trieRoot;
                 } else {
                     // 当前特殊字符在敏感词内部
                     to++;
