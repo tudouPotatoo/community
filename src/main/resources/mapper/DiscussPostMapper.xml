@@ -39,4 +39,10 @@
         insert into discuss_post (<include refid="insertDiscussPostColumnName"></include>)
         values (#{userId}, #{title}, #{content}, #{type}, #{status}, #{createTime}, #{commentCount}, #{score})
     </insert>
+
+    <select id="selectDiscussPostById" resultType="DiscussPost">
+        SELECT <include refid="selectDiscussPostColumnName"/>
+        FROM discuss_post
+        WHERE id = #{discussPostId}
+    </select>
 </mapper>

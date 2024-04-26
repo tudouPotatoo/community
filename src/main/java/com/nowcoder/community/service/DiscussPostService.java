@@ -76,4 +76,13 @@ public class DiscussPostService {
         // 4. 将该对象存入数据库
         discussPostMapper.insertDiscussPost(discussPost);
     }
+
+    /**
+     * 根据id获取帖子信息
+     * @param id
+     * @return
+     */
+    public DiscussPost getDiscussPostById(int id) {
+        return discussPostMapper.selectDiscussPostById(id);
+    }
 }

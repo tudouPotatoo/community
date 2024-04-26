@@ -1,15 +1,16 @@
 package com.nowcoder.community.controller;
 
+import com.nowcoder.community.entity.DiscussPost;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.DiscussPostService;
+import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.utils.CommunityUtil;
 import com.nowcoder.community.utils.HostHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping("/discussPost")
@@ -19,6 +20,9 @@ public class DiscussPostController {
 
     @Autowired
     private DiscussPostService discussPostService;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * 增加一条帖子
@@ -60,5 +64,27 @@ public class DiscussPostController {
 
         // TODO 异常后续统一处理
         return CommunityUtil.getJsonString(0, "发布成功！");
+    }
+
+    /**
+     * 根据id获取帖子详情信息
+     * 1. 根据帖子id获取帖子信息
+     * 2. 根据用户id获取用户信息
+     * 3. 将帖子信息、用户信息都封装到Model中 返回帖子详情页面
+     * @param id
+     * @param mv
+     * @return
+     */
+    @GetMapping("/detail/{discussPostId}")
+    public ModelAndView getDiscussPostDetail(@PathVariable("discussPostId") int id, ModelAndView mv) {
+        // 1. 根据帖子id获取帖子信息
+        DiscussPost discussPost = discussPostService.getDiscussPostById(id);
+        // 2. 根据用户id获取用户信息
+        User user = userService.getUserById(discussPost.getUserId());
+        // 3. 将帖子信息、用户信息都封装到Model中 返回帖子详情页面
+        mv.addObject("post", discussPost);
+        mv.addObject("user", user);
+        mv.setViewName("/site/discuss-detail");
+        return mv;
     }
 }
