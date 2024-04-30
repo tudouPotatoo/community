@@ -113,7 +113,7 @@
 				</div>
 				<!-- 回帖列表 -->
 				<ul class="list-unstyled mt-4">
-					<li class="media pb-3 pt-3 mb-3 border-bottom" th:each="cvo:${comments}">
+					<li class="media pb-3 pt-3 mb-3 border-bottom" th:each="cvo:${commentVoList}">
 						<a href="profile.html">
 							<img th:src="${cvo.user.headerUrl}" class="align-self-start mr-4 rounded-circle user-header" alt="用户头像" >
 						</a>
@@ -138,7 +138,7 @@
 							<!-- 回复列表 -->
 							<ul class="list-unstyled mt-4 bg-gray p-3 font-size-12 text-muted">
 
-								<li class="pb-3 pt-3 mb-3 border-bottom" th:each="rvo:${cvo.replys}">
+								<li class="pb-3 pt-3 mb-3 border-bottom" th:each="rvo:${cvo.replyVoList}">
 									<div>
 										<span th:if="${rvo.target==null}">
 											<b class="text-info" th:text="${rvo.user.username}">寒江雪</b>:&nbsp;&nbsp;
@@ -190,8 +190,8 @@
 					</li>
 				</ul>
 				<!-- 分页 -->
-<!--				<nav class="mt-5" th:replace="index::pagination">-->
-				<nav class="mt-5">
+				<nav class="mt-5" th:replace="index::pagination">
+<!--				<nav class="mt-5">-->
 					<ul class="pagination justify-content-center">
 						<li class="page-item"><a class="page-link" href="#">首页</a></li>
 						<li class="page-item disabled"><a class="page-link" href="#">上一页</a></li>
