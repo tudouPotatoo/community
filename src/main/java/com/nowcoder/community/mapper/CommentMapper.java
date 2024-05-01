@@ -22,4 +22,11 @@ public interface CommentMapper {
      * @return
      */
     public int selectCountByEntityId(int entityType, int entityId);
+
+    /**
+     * 添加评论
+     * @param comment
+     * @return
+     */
+    public int insertComment(Comment comment);
 }

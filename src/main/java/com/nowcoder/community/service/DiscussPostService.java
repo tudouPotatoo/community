@@ -85,4 +85,14 @@ public class DiscussPostService {
     public DiscussPost getDiscussPostById(int id) {
         return discussPostMapper.selectDiscussPostById(id);
     }
+
+    /**
+     * 更新帖子的评论数量
+     * @param discussPostId
+     * @param count
+     * @return
+     */
+    public int updateDiscussPostCommentCount(int discussPostId, int count) {
+        return discussPostMapper.updateDiscussPostCommentCount(discussPostId, count);
+    }
 }

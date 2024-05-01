@@ -45,4 +45,10 @@
         FROM discuss_post
         WHERE id = #{discussPostId}
     </select>
+
+    <insert id="updateDiscussPostCommentCount">
+        update discuss_post
+        set comment_count = #{count}
+        where id = #{id}
+    </insert>
 </mapper>

@@ -100,6 +100,11 @@ public class DiscussPostController implements CommunityConstant {
         mv.addObject("post", discussPost);
         mv.addObject("user", user);
 
+        // 评论分页信息
+        commentPage.setRows(discussPost.getCommentCount());
+        commentPage.setPageSize(5);
+        commentPage.setPath("/discussPost/detail/" + id);
+
         // 4. 获取帖子的评论信息，并封装到Model中
         List<Comment> commentList = commentService.getCommentByEntityId(ENTITY_TYPE_POST, id, commentPage.getOffset(), commentPage.getPageSize());
         List<Map<String, Object>> commentVoList = new ArrayList<>();
