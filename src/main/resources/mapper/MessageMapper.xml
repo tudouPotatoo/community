@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nowcoder.community.mapper.MessageMapper">
+    <sql id="messageSelectColumnName">
+        id, from_id, to_id, conversation_id, content, status, create_time
+    </sql>
+
+    <!--status=2代表已删除的数据，from_id=1代表系统消息-->
+    <!--查询用户的会话列表-->
+    <select id="selectConversationList" resultType="message">
+        select <include refid="messageSelectColumnName"></include>
+        from message
+        where id in(
+            select max(id)
+            from message
+            where
+                status != 2
+                and from_id != 1
+                and (from_id = #{userId} or to_id = #{userId})
+            group by conversation_id
+        )
+        order by id desc
+        limit #{pageSize} offset #{offset}
+    </select>
+
+    <!--查询用户的总会话数量-->
+    <select id="selectConversationCount" resultType="int">
+        select count(id)
+        from message
+        where id in(
+            select max(id)
+            from message
+            where
+                status != 2
+              and from_id != 1
+              and (from_id = #{userId} or to_id = #{userId})
+            group by conversation_id
+        )
+    </select>
+
+    <!--分页查询一个会话的私信列表-->
+    <select id="selectDirectMessageList" resultType="message">
+        select <include refid="messageSelectColumnName"></include>
+        from message
+        where
+            status != 2
+            and from_id != 1
+            and conversation_id = #{conversationId}
+        order by id desc
+        limit #{pageSize} offset #{offset}
+    </select>
+
+    <!--查询一个会话的私信总量-->
+    <select id="selectDirectMessageCount" resultType="int">
+        select count(id)
+        from message
+        where
+            status != 2
+            and from_id != 1
+            and conversation_id = #{conversationId}
+    </select>
+
+    <!--查询未读消息数量-->
+    <select id="selectUnreadMessageCount" resultType="int">
+        select count(id)
+        from message
+        where
+            status = 0
+            and from_id != 1
+            and to_id = #{userId}
+            <if test="conversationId != null">
+                and conversation_id = #{conversationId}
+            </if>
+    </select>
+</mapper>

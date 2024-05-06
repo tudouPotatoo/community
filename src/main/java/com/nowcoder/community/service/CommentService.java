@@ -47,6 +47,10 @@ public class CommentService implements CommunityConstant {
      * @param comment
      * @return
      */
+    // 使用事务，保证【添加评论、更新帖子评论数量】两件事的原子性
+    // isolation指定隔离级别，propagation指定事务的传播行为
+    // Isolation.READ_COMMITTED 表示读已提交。
+    // Propagation.REQUIRED表示如果当前没有事务，就创建一个新的事务；如果已经存在一个事务中，就加入到这个事务中。这确保了一系列操作要么全部成功提交，要么全部失败回滚。
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     public int addComment(Comment comment) {
         // 1. 完善评论数据
