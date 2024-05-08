@@ -1,17 +1,34 @@
 package com.nowcoder.community.service;
 
 import com.nowcoder.community.entity.Message;
+import com.nowcoder.community.entity.User;
 import com.nowcoder.community.mapper.MessageMapper;
+import com.nowcoder.community.mapper.UserMapper;
+import com.nowcoder.community.utils.CommunityConstant;
+import com.nowcoder.community.utils.CommunityUtil;
+import com.nowcoder.community.utils.HostHolder;
+import com.nowcoder.community.utils.SensitiveWordsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
-public class MessageService {
+public class MessageService implements CommunityConstant {
 
     @Autowired
     private MessageMapper messageMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private SensitiveWordsFilter sensitiveWordsFilter;
+
+    @Autowired
+    private HostHolder hostHolder;
 
     /**
      * 分页查询用户的会话列表
@@ -63,5 +80,62 @@ public class MessageService {
      */
     public int getUnreadMessageCount(int userId, String conversationId) {
         return messageMapper.selectUnreadMessageCount(userId, conversationId);
+    }
+
+    /**
+     * 添加一条新消息
+     * 1. 根据用户名查询用户
+     *      用户不存在 --> 返回错误信息
+     *      用户存在 --> 继续向下
+     * 2. 过滤消息内容
+     * 3. 创建Message对象，完善信息
+     * 4. 调用Mapper层方法，插入Message到数据库
+     * @param targetUsername 消息的接收方
+     * @param content 消息内容
+     * @return 发送消息结果
+     */
+    public String addMessage(String targetUsername, String content) {
+        // 1. 根据用户名查询用户
+        User targetUser = userMapper.selectByUsername(targetUsername);
+        // 用户不存在 --> 返回错误信息
+        if (targetUser == null) {
+            return CommunityUtil.getJsonString(-1, "该用户不存在！");
+        }
+        // 用户存在 --> 继续向下
+
+        // 2. 过滤消息内容
+        content = HtmlUtils.htmlEscape(content);
+        content = sensitiveWordsFilter.filter(content);
+
+        // 3. 创建Message对象，完善信息
+        Message message = new Message();
+        int fromId = hostHolder.getUser().getId();
+        message.setFromId(fromId);
+        int toId = targetUser.getId();
+        message.setToId(toId);
+        String conversationId = null;
+        if (fromId < toId) {
+            conversationId = fromId + "_" + toId;
+        } else {
+            conversationId = toId + "_" + fromId;
+        }
+        message.setConversationId(conversationId);
+        message.setContent(content);
+        message.setCreateTime(new Date());
+        message.setStatus(0);  // 状态设为未读
+
+        // 4. 调用Mapper层方法，插入Message到数据库
+        messageMapper.insertMessage(message);
+
+        return CommunityUtil.getJsonString(0, "消息已成功发送！");
+    }
+
+    /**
+     * 将下列消息的状态设为已读
+     * @param messageList
+     * @return
+     */
+    public int readMessage(List<Message> messageList) {
+        return messageMapper.updateStatus(messageList, READ_MESSAGE_STATUS);
     }
 }

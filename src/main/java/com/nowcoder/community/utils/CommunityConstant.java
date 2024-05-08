@@ -33,4 +33,18 @@ public interface CommunityConstant {
      */
     int ENTITY_TYPE_COMMENT = 2;
 
+    /**
+     * 未读消息状态
+     */
+    int UNREAD_MESSAGE_STATUS = 0;
+
+    /**
+     * 已读消息状态
+     */
+    int READ_MESSAGE_STATUS = 1;
+
+    /**
+     * 已删除消息状态
+     */
+    int DELETED_MESSAGE_STATUS = 2;
 }

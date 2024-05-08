@@ -8,6 +8,10 @@
         id, from_id, to_id, conversation_id, content, status, create_time
     </sql>
 
+    <sql id="messageInsertColumnName">
+        from_id, to_id, conversation_id, content, status, create_time
+    </sql>
+
     <!--status=2代表已删除的数据，from_id=1代表系统消息-->
     <!--查询用户的会话列表-->
     <select id="selectConversationList" resultType="message">
@@ -74,5 +78,27 @@
             <if test="conversationId != null">
                 and conversation_id = #{conversationId}
             </if>
+    </select>
+
+    <!--插入一条新的消息-->
+    <insert id="insertMessage">
+        insert into message (<include refid="messageInsertColumnName"></include>)
+        values (#{fromId}, #{toId}, #{conversationId}, #{content}, #{status}, #{createTime})
+    </insert>
+
+    <!--更新一组Message对象的状态-->
+    <update id="updateStatus">
+        update message set status = #{status}
+        where id in
+        <foreach collection="messageList" item="message" open="(" close=")" separator=",">
+            #{message.id}
+        </foreach>
+    </update>
+
+    <!--根据id查询消息-->
+    <select id="selectById" resultType="message">
+        select <include refid="messageSelectColumnName"></include>
+        from message
+        where id = #{id}
     </select>
 </mapper>

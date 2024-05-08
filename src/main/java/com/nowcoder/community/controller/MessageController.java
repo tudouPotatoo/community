@@ -5,12 +5,11 @@ import com.nowcoder.community.entity.Page;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.MessageService;
 import com.nowcoder.community.service.UserService;
+import com.nowcoder.community.utils.CommunityConstant;
 import com.nowcoder.community.utils.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/message")
-public class MessageController {
+public class MessageController implements CommunityConstant {
     @Autowired
     private HostHolder hostHolder;
 
@@ -97,7 +96,9 @@ public class MessageController {
      * 3. 完善显示信息
      *    3.1 私信本身
      *    3.2 私信的发送者
-     *  4. 返回封装好的内容 跳转到letter-detail页面
+     *  4. 返回封装好的内容 准备跳转到letter-detail页面
+     *  5. 将未读消息状态设为已读
+     *  6. 返回结果
      * @param conversationId
      * @param mv
      * @param page
@@ -126,9 +127,19 @@ public class MessageController {
 
             directMessageVoList.add(directMessageVo);
         }
-        // 4. 返回封装好的内容 跳转到letter-detail页面
+        // 4. 返回封装好的内容 准备跳转到letter-detail页面
         mv.addObject("directMessageVoList", directMessageVoList);
         mv.setViewName("/site/letter-detail");
+
+        // 5. 将未读消息状态设为已读
+        List<Message> unreadMessageList = new ArrayList<>();
+        for (Message message : directMessageList) {
+            if (message.getStatus() == UNREAD_MESSAGE_STATUS) {
+                unreadMessageList.add(message);
+            }
+        }
+        messageService.readMessage(unreadMessageList);
+        // 6. 返回结果
         return mv;
     }
 
@@ -148,5 +159,17 @@ public class MessageController {
         } else {
             return userService.getUserById(userId1);
         }
+    }
+
+    /**
+     * 当前用户给其他用户发送一条私信
+     * @param targetUsername 目标用户的用户名
+     * @param content 私信内容
+     * @return
+     */
+    @PostMapping("/send")
+    @ResponseBody
+    private String sendMessage(String targetUsername, String content) {
+        return messageService.addMessage(targetUsername, content);
     }
 }
