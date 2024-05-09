@@ -136,6 +136,10 @@ public class MessageService implements CommunityConstant {
      * @return
      */
     public int readMessage(List<Message> messageList) {
-        return messageMapper.updateStatus(messageList, READ_MESSAGE_STATUS);
+        if (messageList.size() > 0) {
+            return messageMapper.updateStatus(messageList, READ_MESSAGE_STATUS);
+        } else {
+            return 0;
+        }
     }
 }

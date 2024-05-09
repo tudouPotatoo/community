@@ -61,4 +61,13 @@ public class HomeController {
         mv.setViewName("index");
         return mv;
     }
+
+    /**
+     * 报错时跳转至500页面
+     * @return
+     */
+    @GetMapping("/error")
+    public String getErrorPage() {
+        return "/error/500";
+    }
 }

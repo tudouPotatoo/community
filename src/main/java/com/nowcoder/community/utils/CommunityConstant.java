@@ -47,4 +47,16 @@ public interface CommunityConstant {
      * 已删除消息状态
      */
     int DELETED_MESSAGE_STATUS = 2;
+
+    /**
+     * 异步请求返回状态码
+     * 成功
+     */
+    int SERVER_SUCCESS = 1;
+
+    /**
+     * 异步请求返回状态码
+     * 失败
+     */
+    int SERVER_FAIL = -1;
 }
