@@ -4,14 +4,13 @@ import com.nowcoder.community.entity.DiscussPost;
 import com.nowcoder.community.entity.Page;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.DiscussPostService;
+import com.nowcoder.community.service.LikeService;
 import com.nowcoder.community.service.UserService;
+import com.nowcoder.community.utils.CommunityConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
@@ -27,6 +26,9 @@ public class HomeController {
 
     @Autowired
     private DiscussPostService discussPostService;
+
+    @Autowired
+    private LikeService likeService;
 
     /**
      * 获取主页面数据
@@ -52,6 +54,8 @@ public class HomeController {
             Map<String, Object> map = new HashMap<>();
             map.put("user", user);
             map.put("post", post);
+            // 将帖子的点赞数据存入列表
+            map.put("likeCount", likeService.getLikeCount(CommunityConstant.ENTITY_TYPE_POST, post.getId()));
             postAndUserInfo.add(map);
         }
         // 4. 将数据信息添加到ModelAndView

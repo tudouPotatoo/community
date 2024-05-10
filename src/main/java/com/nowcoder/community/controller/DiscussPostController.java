@@ -6,6 +6,7 @@ import com.nowcoder.community.entity.Page;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.CommentService;
 import com.nowcoder.community.service.DiscussPostService;
+import com.nowcoder.community.service.LikeService;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.utils.CommunityConstant;
 import com.nowcoder.community.utils.CommunityUtil;
@@ -35,6 +36,9 @@ public class DiscussPostController implements CommunityConstant {
 
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private LikeService likeService;
 
     /**
      * 增加一条帖子
@@ -84,7 +88,8 @@ public class DiscussPostController implements CommunityConstant {
      * 2. 根据用户id获取用户信息
      * 3. 将帖子信息、用户信息都封装到Model中
      * 4. 获取帖子的评论信息，并封装到Model中
-     * 5. 返回帖子详情页面
+     * 5. 获取当前帖子的点赞信息，封装到Model中
+     * 6. 返回帖子详情页面
      *
      * @param id
      * @param mv
@@ -116,6 +121,9 @@ public class DiscussPostController implements CommunityConstant {
             // 获取评论用户
             User commentUser = userService.getUserById(comment.getUserId());
             commentVo.put("user", commentUser);
+            // 获取评论的点赞数和当前用户的点赞情况
+            commentVo.put("likeStatus", likeService.getLikeStatus(ENTITY_TYPE_COMMENT, comment.getId()));
+            commentVo.put("likeCount", likeService.getLikeCount(ENTITY_TYPE_COMMENT, comment.getId()));
             // 获取评论回复总数
             int replyCount = commentService.getCountByEntityId(ENTITY_TYPE_COMMENT, comment.getId());
             commentVo.put("replyCount", replyCount);
@@ -127,6 +135,9 @@ public class DiscussPostController implements CommunityConstant {
                 Map<String, Object> replyVo = new HashMap<>();
                 // 获取回复本身
                 replyVo.put("reply", reply);
+                // 获取回复的点赞数和当前用户的点赞情况
+                replyVo.put("likeStatus", likeService.getLikeStatus(ENTITY_TYPE_COMMENT, reply.getId()));
+                replyVo.put("likeCount", likeService.getLikeCount(ENTITY_TYPE_COMMENT, reply.getId()));
                 // 获取回复作者用户
                 User replyUser = userService.getUserById(reply.getUserId());
                 replyVo.put("user", replyUser);
@@ -143,7 +154,11 @@ public class DiscussPostController implements CommunityConstant {
 
         mv.addObject("commentVoList", commentVoList);
 
-        // 5. 返回帖子详情页面
+        // 5. 获取当前帖子的点赞信息，封装到Model中
+        mv.addObject("likeStatus", likeService.getLikeStatus(ENTITY_TYPE_POST, id));
+        mv.addObject("likeCount", likeService.getLikeCount(ENTITY_TYPE_POST, id));
+
+        // 6. 返回帖子详情页面
         mv.setViewName("/site/discuss-detail");
         return mv;
     }

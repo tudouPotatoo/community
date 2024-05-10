@@ -59,4 +59,15 @@ public interface CommunityConstant {
      * 失败
      */
     int SERVER_FAIL = -1;
+
+    /**
+     * 用户点赞状态
+     * 已点赞
+     */
+    int LIKE_STATUS = 1;
+    /**
+     * 用户点赞状态
+     * 未点赞
+     */
+    int UNLIKE_STATUS = 0;
 }
