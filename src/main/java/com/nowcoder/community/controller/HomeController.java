@@ -55,7 +55,7 @@ public class HomeController {
             map.put("user", user);
             map.put("post", post);
             // 将帖子的点赞数据存入列表
-            map.put("likeCount", likeService.getLikeCount(CommunityConstant.ENTITY_TYPE_POST, post.getId()));
+            map.put("likeCount", likeService.getEntityLikeCount(CommunityConstant.ENTITY_TYPE_POST, post.getId()));
             postAndUserInfo.add(map);
         }
         // 4. 将数据信息添加到ModelAndView

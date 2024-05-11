@@ -22,7 +22,7 @@ public class LikeController implements CommunityConstant {
      */
     @PostMapping("/like")
     @ResponseBody
-    public String like(int entityType, int entityId) {
-        return CommunityUtil.getJsonString(SERVER_SUCCESS, null, likeService.like(entityType, entityId));
+    public String like(int entityType, int entityId, int entityAuthorId) {
+        return CommunityUtil.getJsonString(SERVER_SUCCESS, null, likeService.like(entityType, entityId, entityAuthorId));
     }
 }

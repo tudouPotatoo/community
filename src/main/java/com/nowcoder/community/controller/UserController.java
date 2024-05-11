@@ -2,6 +2,7 @@ package com.nowcoder.community.controller;
 
 import com.nowcoder.community.annotation.LoginRequired;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.service.LikeService;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.utils.CommunityUtil;
 import com.nowcoder.community.utils.HostHolder;
@@ -34,6 +35,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private LikeService likeService;
 
     @Value("${community.path.domain}")
     private String domain;
@@ -200,6 +204,31 @@ public class UserController {
             mv.addObject("oldPasswordMsg", map.get("oldPasswordMsg"));
             return mv;
         }
+        return mv;
+    }
+
+    /**
+     * 访问用户主页
+     * @param userId
+     * @param mv
+     * @return
+     */
+    @GetMapping("/profile/{userId}")
+    public ModelAndView getProfilePage(@PathVariable int userId, ModelAndView mv) {
+        // 校验userId对应的用户是否存在
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            mv.setViewName("/error/404");
+            return mv;
+        }
+        // 将user信息加入mv
+        mv.addObject("user", user);
+
+        // 查询用户获得的赞的数量
+        long likeCount = likeService.getUserLikeCount(userId);
+        mv.addObject("likeCount", likeCount);
+
+        mv.setViewName("/site/profile");
         return mv;
     }
 }

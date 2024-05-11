@@ -1,5 +1,6 @@
 package com.nowcoder.community.controller;
 
+import com.nowcoder.community.annotation.LoginRequired;
 import com.nowcoder.community.entity.Comment;
 import com.nowcoder.community.entity.DiscussPost;
 import com.nowcoder.community.entity.Page;
@@ -95,6 +96,7 @@ public class DiscussPostController implements CommunityConstant {
      * @param mv
      * @return
      */
+    @LoginRequired
     @GetMapping("/detail/{discussPostId}")
     public ModelAndView getDiscussPostDetail(@PathVariable("discussPostId") int id, ModelAndView mv, Page commentPage) {
         // 1. 根据帖子id获取帖子信息
@@ -123,7 +125,7 @@ public class DiscussPostController implements CommunityConstant {
             commentVo.put("user", commentUser);
             // 获取评论的点赞数和当前用户的点赞情况
             commentVo.put("likeStatus", likeService.getLikeStatus(ENTITY_TYPE_COMMENT, comment.getId()));
-            commentVo.put("likeCount", likeService.getLikeCount(ENTITY_TYPE_COMMENT, comment.getId()));
+            commentVo.put("likeCount", likeService.getEntityLikeCount(ENTITY_TYPE_COMMENT, comment.getId()));
             // 获取评论回复总数
             int replyCount = commentService.getCountByEntityId(ENTITY_TYPE_COMMENT, comment.getId());
             commentVo.put("replyCount", replyCount);
@@ -137,7 +139,7 @@ public class DiscussPostController implements CommunityConstant {
                 replyVo.put("reply", reply);
                 // 获取回复的点赞数和当前用户的点赞情况
                 replyVo.put("likeStatus", likeService.getLikeStatus(ENTITY_TYPE_COMMENT, reply.getId()));
-                replyVo.put("likeCount", likeService.getLikeCount(ENTITY_TYPE_COMMENT, reply.getId()));
+                replyVo.put("likeCount", likeService.getEntityLikeCount(ENTITY_TYPE_COMMENT, reply.getId()));
                 // 获取回复作者用户
                 User replyUser = userService.getUserById(reply.getUserId());
                 replyVo.put("user", replyUser);
@@ -156,7 +158,7 @@ public class DiscussPostController implements CommunityConstant {
 
         // 5. 获取当前帖子的点赞信息，封装到Model中
         mv.addObject("likeStatus", likeService.getLikeStatus(ENTITY_TYPE_POST, id));
-        mv.addObject("likeCount", likeService.getLikeCount(ENTITY_TYPE_POST, id));
+        mv.addObject("likeCount", likeService.getEntityLikeCount(ENTITY_TYPE_POST, id));
 
         // 6. 返回帖子详情页面
         mv.setViewName("/site/discuss-detail");
