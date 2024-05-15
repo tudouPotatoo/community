@@ -2,8 +2,10 @@ package com.nowcoder.community.controller;
 
 import com.nowcoder.community.annotation.LoginRequired;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.service.FollowService;
 import com.nowcoder.community.service.LikeService;
 import com.nowcoder.community.service.UserService;
+import com.nowcoder.community.utils.CommunityConstant;
 import com.nowcoder.community.utils.CommunityUtil;
 import com.nowcoder.community.utils.HostHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +30,7 @@ import java.util.Map;
 @Slf4j
 @Controller
 @RequestMapping("/user")
-public class UserController {
+public class UserController implements CommunityConstant {
 
     @Autowired
     private HostHolder hostHolder;
@@ -38,6 +40,9 @@ public class UserController {
 
     @Autowired
     private LikeService likeService;
+
+    @Autowired
+    private FollowService followService;
 
     @Value("${community.path.domain}")
     private String domain;
@@ -227,6 +232,21 @@ public class UserController {
         // 查询用户获得的赞的数量
         long likeCount = likeService.getUserLikeCount(userId);
         mv.addObject("likeCount", likeCount);
+
+        // 查询用户关注的用户的数量
+        long followeeCount = followService.getFolloweeCount(userId, ENTITY_TYPE_USER);
+        mv.addObject("followeeCount", followeeCount);
+
+        // 查询用户粉丝数量
+        long followerCount = followService.getFollowerCount(ENTITY_TYPE_USER, userId);
+        mv.addObject("followerCount", followerCount);
+
+        // 查询当前用户对该用户的关注状态
+        boolean hasFollowed = false;
+        if (hostHolder.getUser() != null) {
+             hasFollowed = followService.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
+        }
+        mv.addObject("hasFollowed", hasFollowed);
 
         mv.setViewName("/site/profile");
         return mv;

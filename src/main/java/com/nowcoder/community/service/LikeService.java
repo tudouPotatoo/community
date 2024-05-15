@@ -16,8 +16,6 @@ import java.util.Map;
 
 @Service
 public class LikeService implements CommunityConstant {
-    private static final String SPLIT = ":";
-    private static final String PREFIX = "like";
 
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -28,63 +26,24 @@ public class LikeService implements CommunityConstant {
     /**
      * 点赞
      * 1. 根据实体类型和id拼接key
-     * 2. 查看当前用户是否已经点过赞
-     *    2.1 是-->取消点赞
+     * 2. 根据实体作者id拼接key
+     * 3. 查看当前用户是否已经点过赞
+     *    3.0 开启事务
+     *    3.1 是-->取消点赞
      *             将该用户从set中移除
      *             将目标用户的点赞数量-1
-     *    2.2 不是-->点赞
+     *    3.2 不是-->点赞
      *             将当前用户加入set
      *             将目标用户的点赞数量+1
-     * 3. 将最新的点赞数量以及点赞状态加入map
-     * 4. 返回map
+     *    3.3 提交事务
+     * 4. 将最新的点赞数量以及点赞状态加入map
+     * 5. 返回map
      * @param entityType 实体类型
      * @param entityId 实体id
-     * @param entityType
-     * @param entityId
+     * @param entityAuthorId 实体作者：帖子作者/评论作者
      * @return
      */
     public Map<String, Object> like(int entityType, int entityId, int entityAuthorId) {
-        // User user = hostHolder.getUser();
-        // String idStr = String.valueOf(user.getId());
-        // Map<String, Object> res = new HashMap<>();
-        // // 1. 根据实体类型和id拼接key like:entityType:entityId
-        // String key = RedisKeyUtil.getEntityLikeKey(entityType, entityId);
-        // // 2. 查看当前用户是否已经点过赞
-        // int likeStatus = getLikeStatus(entityType, entityId);
-        // // 2.1 是-->取消点赞
-        // if (likeStatus == LIKE_STATUS) {
-        //     // 将该用户从set中移除
-        //     redisTemplate.opsForSet().remove(key, idStr);
-        //     // 3. 将点赞状态加入map
-        //     res.put("likeStatus", UNLIKE_STATUS);
-        // } else {
-        //     // 2.2 不是-->点赞
-        //     // 将当前用户加入set
-        //     redisTemplate.opsForSet().add(key, idStr);
-        //     // 3. 将点赞状态加入map
-        //     res.put("likeStatus", LIKE_STATUS);
-        // }
-        //
-        // // 3. 将点赞数量加入map
-        // res.put("likeCount", redisTemplate.opsForSet().size(key));
-        // return  res;
-
-        /**
-         * 点赞
-         * 1. 根据实体类型和id拼接key
-         * 2. 根据实体作者id拼接key
-         * 3. 查看当前用户是否已经点过赞
-         *    3.0 开启事务
-         *    3.1 是-->取消点赞
-         *             将该用户从set中移除
-         *             将目标用户的点赞数量-1
-         *    3.2 不是-->点赞
-         *             将当前用户加入set
-         *             将目标用户的点赞数量+1
-         *    3.3 提交事务
-         * 4. 将最新的点赞数量以及点赞状态加入map
-         * 5. 返回map
-         */
         Map<String, Object> res = new HashMap<>();
 
         // 1. 根据实体类型和id拼接key
